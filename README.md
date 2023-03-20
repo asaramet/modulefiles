@@ -1,4 +1,4 @@
-# Installation scripts and modulefiles for system packages
+# Installation scripts and modulefiles for Linux modules
 
 This repository contains a collection of modulefiles and installation scripts for Linux systems, designed to help users install and manage software packages outside the system libraries and folders.
 
