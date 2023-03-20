@@ -16,7 +16,7 @@ Note that not all software packages may contain modulefiles or installation scri
 
 Key benefits of using *Modules* include cleaner installations, easier maintenance, and better version control. For example, you can load a different version of a software package to test compatibility or switch between versions of a package depending on your needs.
 
-Each software package has a corresponding *modulefile* that defines the environment variables needed to use it. Modulefiles instruct the `module` command to alter or set shell environment variables such as PATH, LD_LIBRARY_PATH, INCLUDE, and more. Modulefiles are usually shared by many users on the system, and each user can additionally alter their own variables.
+Each software package has a corresponding *modulefile* that defines the environment variables needed to use it. Modulefiles instruct the `module` command to alter or set shell environment variables such as `PATH`, `LD_LIBRARY_PATH`, `INCLUDE`, and more. Modulefiles are usually shared by many users on the system, and each user can additionally alter their own variables.
 
 The `module` command has several subcommands to interact with the system's modules:
 | Command                     | Description                                              |
