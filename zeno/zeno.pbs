@@ -1,0 +1,36 @@
+#!/bin/bash
+# number of processors to run a job ncpus=nodes*ppn
+#PBS -l nodes=1:ppn=16:mem64gb
+
+# wall time (up to 24 hours)
+#PBS -l walltime=5:00:00
+
+# name of the job
+#PBS -N zeno
+
+# set a log file for job's output
+#PBS -o outfile.log
+#PBS -j oe
+
+# send an e-mail when a job begins, aborts or ends
+#PBS -m abe
+# e-mail address specification
+#PBS -M asaramet@hs-esslingen.de
+
+# switches to the directory from which 'msub' command run:
+cd $PBS_O_WORKDIR
+
+# some info about job submission time
+echo "Starting at "
+date
+
+module load cae/zeno/1.0
+
+# run tests
+zeno-test-bike
+#zeno-test-bike-brake
+#zeno-test-bike-conn
+
+#some post processing info:
+echo "Run completed at "
+date

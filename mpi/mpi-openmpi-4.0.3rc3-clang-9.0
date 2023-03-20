@@ -1,0 +1,168 @@
+#%Module1.0
+#
+# Module:          mpi/openmpi/4.0.3rc3-clang-9.0
+# Revision:        esbw11
+# TargetSystem:    RHEL64
+# Priority:        optional
+# 2ndLevelSupport: cluster-support <at> hs-esslingen.de
+#
+##### Revision history:
+#
+# mhbw01 110207 s.hau Initial revision of module
+# esbw01 130517 a.reber Upgraded to 1.6.4
+# esbw02 130925 a.saramet Upgraded to 1.6.5
+# esbw04 140331 a.reber Upgraded to 1.8
+# hsbw06 150831 r.doros Upgraded to 1.10
+# hsbw07 160728 r.doros Upgraded to 2.0
+# hsbw08 170327 r.doros Upgraded to 2.1
+# hsbw09 170928 r.doros Upgraded to 3.0
+# hsbw10 180828 r.keller Upgraded to 3.1
+# esbw11 190320 r.keller Upgraded to 4.0
+# esbw11 190404 r.keller Upgraded to 4.0.1
+#
+# rpmbuild -ba openmpi-4.0.spec --define 'compiler clang/9.0'
+#
+# * Tue Feb 25 2020 Rainer Keller <rainer.keller@hs-esslingen.de> - 4.0.3rc3-1
+# - Adapted for OpenMPI-4.0.3rc3 -- yes a release candidate -- want to overinstall later
+# - Updated UCX to v1.7.0 and libfabrics to v1.9.0
+# - Amended for PGI compiler and LLVM/clang
+# 
+# * Wed Apr 03 2019 Rainer Keller <rainer.keller@hs-esslingen.de> - 4.0.1-2
+# - Adapted for OpenMPI-v4.0.1
+# - Updated UCX from v1.5.0 to v1.5.1 and libfabrics from v1.6.1 to v1.7.0
+# 
+# * Wed Mar 20 2019 Rainer Keller <rainer.keller@hs-esslingen.de> - 4.0.0-1
+# - Adapted for OpenMPI-v4.0.0
+# - Added compilation of ucx
+# 
+# * Fri Sep 14 2018 Rainer Keller <rainer.keller@hs-esslingen.de> - 3.1.2-2
+# - Added compilation of libfabrics
+# - Amended storing of intermediate logs (configure/make)
+# 
+# * Tue Aug 28 2018 Rainer Keller <rainer.keller@hs-esslingen.de> - 3.1.2-1
+# - updated to 3.1.2
+# - updated the compiler flags
+# 
+# * Wed Apr 04 2018 Rafael Doros <rafael.doros@hft-stuttgart.de> - 3.0.1-1
+# - updated to 3.0.1
+# 
+# * Thu Sep 28 2017 Rafael Doros <rafael.doros@hft-stuttgart.de> - 3.0.0-1
+# - updated to 3.0.0
+# - remove "--with-devel-headers" flag
+# 
+
+# Base defs:
+
+set              version           "4.0.3rc3-clang-9.0"
+set              base_dir          "/opt/bwhpc/common/mpi/openmpi/$version"
+
+setenv           MPI_VERSION       "$version"
+setenv           MPI_HOME          "$base_dir"
+setenv           MPIDIR            "$base_dir"
+
+# Defs for Open MPI:
+
+setenv           MPI_BIN_DIR       "$base_dir/bin"
+setenv           MPI_LIB_DIR       "$base_dir/lib"
+# OpenMPI requires UCX and libfabric -- which install themselves into RPM's _libdir, aka lib64
+setenv           MPI_LIB64_DIR     "$base_dir/lib64"
+setenv           MPI_INC_DIR       "$base_dir/include"
+setenv           MPI_MAN_DIR       "$base_dir/share/man"
+setenv           MPI_EXA_DIR       "$base_dir/examples"
+
+# Setup of PATH environment:
+
+prepend-path     PATH              "$env(MPI_BIN_DIR)"
+prepend-path     LD_LIBRARY_PATH   "$env(MPI_LIB64_DIR):$env(MPI_LIB_DIR)"
+prepend-path     MANPATH           "$env(MPI_MAN_DIR)"
+
+module-whatis    "OpenMPI bindings (mpicc mpicxx mpifort) version $version for clang/9.0"
+
+if { [module-info mode] == "load" || [module-info mode] == "add" || [module-info mode] == "switch2" } {
+  if { ! [is-loaded "compiler/clang/9.0"] && "clang/9.0" != "gnu/4.8" } {
+    puts stderr "Loading module dependency 'compiler/clang/9.0'."
+    module load "compiler/clang/9.0"
+  }
+  if { ! [is-loaded "compiler/clang/9.0"] && "clang/9.0" != "gnu/4.8" } {
+    puts stderr "\nERROR: Failed to load module dependency 'compiler/clang/9.0'. Please check conflicts with already loaded modules.\n";
+    break
+  }
+}
+
+proc ModulesHelp { } {
+        global env
+
+        puts stderr "
+This module provides the Open MPI Message Passing Interface bindings (mpicc,
+mpicxx, mpifort (mpif77 and mpif90)). The corresponding compiler suite 
+(clang/9.0) module should (and automatically will) be loaded first.
+
+Documentation:
+
+  See man pages of mpicc, mpicxx, mpifort (mpif77, mpif90) and mpirun, 
+  e.g. 'man mpicc'. 
+  For additional help see 'http://www.open-mpi.org/faq/'.
+
+Compiling and executing MPI-programs:
+
+  Instead of the usual compiler commands, you should compile and link your
+  mpi-program with mpicc, mpicxx, mpifort (mpif77 and mpif90). What e.g. 
+  'mpicc' is really doing can be displayed via command 'mpicc -show'.
+
+  Frequently one needs '-I\${MPI_INC_DIR}' in addition.
+
+The MPI-libraries can be found in
+
+  \$MPI_LIB_DIR
+
+Example for compiling an MPI program with Open MPI:
+
+  module load [module-info name]
+  mpicc   -O2 mpi_application.c   -o mpi_application.exe # for C programs
+  mpicxx  -O2 mpi_application.cxx -o mpi_application.exe # for C++ programs
+  mpifort -O2 mpi_application.f   -o mpi_application.exe # for Fortran programs
+  # GNU: Optimization level '-O2' results in substantially faster executables.
+  For additional help see 'http://www.open-mpi.org/faq/?category=mpi-apps'.
+
+Example for executing the MPI program using 4 cores on the local node:
+
+  module load [module-info name]
+  mpirun -np 4 `pwd`/mpi_application.exe
+
+Example PBS snippet for submitting the program on 2 x 8 = 16 cores:
+
+  #PBS -l nodes=2:ppn=8
+  module load [module-info name]
+  mpirun \$PBS_O_WORKDIR/mpi_application.exe
+
+The mpirun command automatically determines the number of workers
+and the hosts for the workers via PBS-TM and/or \$PBS_NODEFILE.
+
+Open MPI offers an abundance on parameters using the MCA. For more
+information, check ompi_info using:
+  ompi_info --param all all --level 9
+
+Good examples of mpirun's parameters are:
+  mpirun -np 4 --report-bindings --mca pml ucx mpi_application
+
+For details on library and include directories please call
+    module show [module-info name]
+
+The man pages, environment variables and compiler commands
+are available after loading '[module-info name]'.
+
+In case of problems, please contact 'bwunicluster-hotline (at) lists.kit.edu'
+or submit a trouble ticket at 'http://www.support.bwhpc-c5.de'.
+
+The full version is: 4.0.3rc3-clang-9.0
+
+"
+}
+
+# Conflicts and pre-requirements at end of file. Otherwise, "module help"
+# will not work, if any of the dependencies fails (which is odd, since
+# "module help" should help the user to solve problems like this one).
+conflict mpi/impi
+conflict mpi/mvapich
+conflict mpi/mvapich2
+conflict mpi/openmpi
