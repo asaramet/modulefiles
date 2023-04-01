@@ -1,6 +1,6 @@
 -- -*- lua -*-
 --[==[
-# Module:          cae/openfoam/v2006
+# Module:          cae/openfoam/v2112
 # Revision:        esbw01 20220316 Alexandru Saramet
 # License:         GPL v3
 # URL:             https://www.openfoam.org

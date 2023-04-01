@@ -50,6 +50,7 @@ sed -i s:'boost_version=boost_1_74_0':'boost_version=boost-system':g etc/config.
 
 . $TARGET_DIR/OpenFOAM-${VERSION}/etc/bashrc
 #foamSystemCheck
+export WM_NCOMPPROCS=80
 ./Allwmake -j 2>&1 | tee Allwmake.log
 ../ThirdParty-${VERSION}/makeCCMIO
 ./Allwmake -j 2>&1 | tee Allwmake.log
